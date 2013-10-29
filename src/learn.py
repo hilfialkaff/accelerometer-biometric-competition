@@ -1,5 +1,6 @@
 import sys, getopt
 from classifier.naivehmm import NaiveHMM
+from evaluation.eval import Evaluator
 import pandas as pd
 
 NAIVE_HMM_STATES=3
@@ -59,3 +60,7 @@ if __name__=='__main__':
     path, model = parse_args(sys.argv[1:])
     models = train_models(path, model)
     print models
+
+    for device_id, model in models.items():
+        evaluator = Evaluator(device_id)
+        evaluator.evaluate(model)
