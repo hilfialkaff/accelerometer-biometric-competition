@@ -1,4 +1,5 @@
 *.pyc
 *.swp
+.ropeproject/
 data/test.csv
 data/train.csv
