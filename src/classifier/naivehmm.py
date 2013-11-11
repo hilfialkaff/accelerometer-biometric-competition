@@ -23,7 +23,7 @@ class NaiveHMM(object):
 		@param test DataFrame object containing T,X,Y,Z values.
 		"""
 		t = np.column_stack([test.X.tolist(), test.Y.tolist(), test.Z.tolist()])
-		return self._hmm.score([t])
+		return self._hmm.score(t)
 
 	def get_hmm(self):
 		return self._hmm
