@@ -8,10 +8,6 @@ TEST_FILE = '../data/test.csv'
 ANSWER_FILE = '../data/answers.csv'
 
 class Evaluator(object):
-    # def __init__(self, device_id):
-    #     self.dids_qn = self.read_questions(QUESTION_FILE, device_id)
-    #     self.device_id = device_id
-
     def __init__(self, models):
         self.models = models
         self.dids_qn = self.read_questions(QUESTION_FILE)
@@ -43,19 +39,6 @@ class Evaluator(object):
 
         return dids_test
 
-    # def read_tests(self, f, seq_id):
-    #     dids = pd.DataFrame(columns=['T', 'X', 'Y', 'Z', 'SequenceId'])
-    #     for df in pd.read_csv(f, chunksize=CHUNK_SIZE):
-    #         dids = pd.concat([dids, df[df['SequenceId']==seq_id]])
-    #     return dids
-
-    # def evaluate(self, model):
-    #     for qn_index, qn_row in self.dids_qn.iterrows():
-    #         dids_test = self.read_tests(TEST_FILE, qn_row['SequenceId'])
-    #         print "device_id:", self.device_id
-    #         score = model.score(dids_test)
-    #         print "score:", score
-
     def evaluate(self):
         print "Start evaluating..."
 
@@ -63,11 +46,7 @@ class Evaluator(object):
         answers['QuestionId'] = []
         answers['IsTrue'] = []
 
-        i = 1
         for qn_index, qn_row in self.dids_qn.iterrows():
-            # best_score = -sys.maxint
-            # best_device = -1
-
             scores = {}
             dids_test = self.dids_test[qn_row['SequenceId']]
 
@@ -78,24 +57,13 @@ class Evaluator(object):
                 score = model.score(dids_test)
                 scores[did] = score
 
-                # if score > best_score:
-                #     best_score = score
-                #     best_device = did
-
-            # print "question:", qn_row['QuestionId'], "prediction:", best_device, \
-            #     "with score:", best_score
-
-            # answers['QuestionId'].append(qn_row['QuestionId'])
-            # if best_device == qn_row['QuizDevice']:
-            #     answers['IsTrue'].append(1)
-            # else:
-            #     answers['IsTrue'].append(0)
-
             did = qn_row['QuizDevice']
             _scores = sorted(scores.iteritems(), key=operator.itemgetter(1))
             rank = _scores.index((did, scores[did])) + 1
 
             answers['QuestionId'].append(qn_row['QuestionId'])
+
+            # Higher than 90% and HMM score is greater than -2000
             if rank > (self.num_devices * 0.90) and scores[did] > -2000:
                 is_true = 1
                 answers['IsTrue'].append(1)
@@ -105,10 +73,6 @@ class Evaluator(object):
 
             print "question:", qn_row['QuestionId'], "device score:", scores[did], \
                 "rank:", rank, "answer:", is_true
-
-            # if i == 100:
-            #     break
-            i += 1
 
         df_answers = pd.DataFrame(answers)
         df_answers.to_csv(ANSWER_FILE, ',', header=True, cols=["QuestionId","IsTrue"], index=False)

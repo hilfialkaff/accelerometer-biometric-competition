@@ -8,3 +8,6 @@
 ## Team
 + [Efe Karakus](http://efekarakus.com)
 + Hilfi Alkaff
+
+## Running
+$: python src/learn.py -p ./data/train.csv -m <model_name>

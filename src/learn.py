@@ -41,27 +41,12 @@ def train(path, model, did):
     return m
 
 
-# def train_models(path, model):
-#     """
-#     @return Dictionary of models for every device.
-#     """
-#     models = {}
-#     for df in pd.read_csv(path, chunksize=CHUNK_SIZE):
-#         devices = df['Device'].unique()
-#         for device in devices:
-#             if not device in models:
-#                 models[device] = train(path, model, device)
-#         # endfor
-#     # end
-#     return models
-
 def train_models(path, model):
     """
     @return Dictionary of models for every device.
     """
     models = {}
     train = {}
-    i = 1
 
     for df in pd.read_csv(path, chunksize=CHUNK_SIZE):
         devices = df['Device'].unique()
@@ -70,10 +55,6 @@ def train_models(path, model):
             if device not in train:
                 train[device] = pd.DataFrame(columns=['T','X','Y','Z','Device'])
             train[device] = pd.concat([train[device], df[df['Device'] == device]])
-
-        i += 1
-        # if i == 1000:
-        #     break
 
     for device, data in train.items():
         print "training device id:", device
@@ -88,7 +69,3 @@ if __name__=='__main__':
     models = train_models(path, model)
     evaluator = Evaluator(models)
     evaluator.evaluate()
-
-    # for device_id, model in models.items():
-    #     evaluator = Evaluator(device_id)
-    #     evaluator.evaluate(model)

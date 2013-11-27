@@ -7,12 +7,11 @@ import pandas as pd
 from sklearn.hmm import GaussianHMM, GMMHMM
 
 class NaiveHMM(object):
-
-	def __init__(self, num_states, hmm_type=0, n_mix=3):
+	def __init__(self, num_states, hmm_type=0, n_mix=3, n_iter=100, n_components=3):
 		if hmm_type == 0:
-			self._hmm = GaussianHMM(4, n_iter=100)
-		elif hmm_type == 1:
-			self._hmm = GMMHMM(n_components=3, n_mix=3, n_iter=100)
+			self._hmm = GaussianHMM(n_mix, n_iter=n_iter)
+		elif hmm_type == 1: # WARNING: VERY VERY VERY SLOW
+			self._hmm = GMMHMM(n_mix=n_mix, n_components=n_components, n_iter=n_iter)
 
 	def fit(self, data):
 		"""
