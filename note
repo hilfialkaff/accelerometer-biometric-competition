@@ -1,0 +1,4 @@
+Known configuration:
+- GaussianHMM(n_mix=3, n_iter=100) -> 53%
+- GaussianHMM(n_mix=4, n_iter=100) -> 64%
+- GMMHMM(n_mix=4, n_components=3, n_iter=100) -> 79%

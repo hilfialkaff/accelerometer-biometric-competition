@@ -27,7 +27,7 @@ def parse_args(argv):
 
 def get_model(model):
     if model == 'NaiveHMM':
-        return NaiveHMM(NAIVE_HMM_STATES)
+        return NaiveHMM(NAIVE_HMM_STATES, 0)
     return None
 
 def train(path, model, did):
@@ -41,26 +41,54 @@ def train(path, model, did):
     return m
 
 
+# def train_models(path, model):
+#     """
+#     @return Dictionary of models for every device.
+#     """
+#     models = {}
+#     for df in pd.read_csv(path, chunksize=CHUNK_SIZE):
+#         devices = df['Device'].unique()
+#         for device in devices:
+#             if not device in models:
+#                 models[device] = train(path, model, device)
+#         # endfor
+#     # end
+#     return models
+
 def train_models(path, model):
     """
     @return Dictionary of models for every device.
     """
     models = {}
+    train = {}
+    i = 1
+
     for df in pd.read_csv(path, chunksize=CHUNK_SIZE):
         devices = df['Device'].unique()
-        for device in devices:
-            if not device in models:
-                models[device] = train(path, model, device)
-        # endfor
-    # end
-    return models
 
+        for device in devices:
+            if device not in train:
+                train[device] = pd.DataFrame(columns=['T','X','Y','Z','Device'])
+            train[device] = pd.concat([train[device], df[df['Device'] == device]])
+
+        i += 1
+        # if i == 1000:
+        #     break
+
+    for device, data in train.items():
+        print "training device id:", device
+        m = get_model(model)
+        m.fit(pd.DataFrame(data))
+        models[device] = m
+
+    return models
 
 if __name__=='__main__':
     path, model = parse_args(sys.argv[1:])
     models = train_models(path, model)
-    print models
+    evaluator = Evaluator(models)
+    evaluator.evaluate()
 
-    for device_id, model in models.items():
-        evaluator = Evaluator(device_id)
-        evaluator.evaluate(model)
+    # for device_id, model in models.items():
+    #     evaluator = Evaluator(device_id)
+    #     evaluator.evaluate(model)

@@ -4,12 +4,15 @@ time of the data points.
 """
 import numpy as np
 import pandas as pd
-from sklearn.hmm import GaussianHMM
+from sklearn.hmm import GaussianHMM, GMMHMM
 
 class NaiveHMM(object):
 
-	def __init__(self, num_states):
-		self._hmm = GaussianHMM(n_components=num_states)
+	def __init__(self, num_states, hmm_type=0, n_mix=3):
+		if hmm_type == 0:
+			self._hmm = GaussianHMM(4, n_iter=100)
+		elif hmm_type == 1:
+			self._hmm = GMMHMM(n_components=3, n_mix=3, n_iter=100)
 
 	def fit(self, data):
 		"""
