@@ -1,11 +1,7 @@
 import pandas as pd
-# import sys
 import operator
 
-CHUNK_SIZE = 1024
-QUESTION_FILE = '../data/questions.csv'
-TEST_FILE = '../data/test.csv'
-ANSWER_FILE = '../data/answers.csv'
+from constants import *
 
 class Evaluator(object):
     def __init__(self, models):
@@ -54,8 +50,13 @@ class Evaluator(object):
                 continue
 
             for did, model in self.models.items():
-                score = model.score(dids_test)
-                scores[did] = score
+                total_score = 0
+                for i in range(NUM_FOLD):
+                    score = model[i].score(dids_test)
+                    print "score for partition", i, "=", score
+                    total_score += score
+
+                scores[did] = total_score / NUM_FOLD
 
             did = qn_row['QuizDevice']
             _scores = sorted(scores.iteritems(), key=operator.itemgetter(1))
@@ -64,7 +65,7 @@ class Evaluator(object):
             answers['QuestionId'].append(qn_row['QuestionId'])
 
             # Higher than 90% and HMM score is greater than -2000
-            if rank > (self.num_devices * 0.90) and scores[did] > -2000:
+            if rank > (self.num_devices * 0.95) and scores[did] > -2000:
                 is_true = 1
                 answers['IsTrue'].append(1)
             else:

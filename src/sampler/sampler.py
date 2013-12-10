@@ -8,7 +8,7 @@ import pandas as pd
 import random
 import sys, getopt
 
-CHUNK_SIZE = 1024
+from constants import *
 
 def random_sample(path):
   dids = pd.DataFrame(columns=['Device'])
