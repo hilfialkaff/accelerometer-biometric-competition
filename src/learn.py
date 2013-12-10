@@ -2,6 +2,8 @@ import sys, getopt
 from classifier.naivehmm import NaiveHMM
 from evaluation.eval import Evaluator
 import pandas as pd
+import numpy as np
+
 from constants import *
 
 def parse_args(argv):
@@ -62,7 +64,7 @@ def train_models(path, model):
         for i in range(NUM_FOLD):
             m = get_model(model)
             m.fit(pd.DataFrame(partitions[i]))
-            models[device][i] = m
+            models[device].append(m)
             print "partition:", i
 
     return models
