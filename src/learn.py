@@ -2,9 +2,9 @@ import sys, getopt
 from classifier.naivehmm import NaiveHMM
 from evaluation.eval import Evaluator
 import pandas as pd
+import numpy as np
 
-NAIVE_HMM_STATES=3
-CHUNK_SIZE = 1024
+from constants import *
 
 def parse_args(argv):
     path = None
@@ -58,9 +58,14 @@ def train_models(path, model):
 
     for device, data in train.items():
         print "training device id:", device
-        m = get_model(model)
-        m.fit(pd.DataFrame(data))
-        models[device] = m
+        partitions = np.array_split(df, NUM_FOLD)
+        models[device] = []
+
+        for i in range(NUM_FOLD):
+            m = get_model(model)
+            m.fit(pd.DataFrame(partitions[i]))
+            models[device].append(m)
+            print "partition:", i
 
     return models
 
